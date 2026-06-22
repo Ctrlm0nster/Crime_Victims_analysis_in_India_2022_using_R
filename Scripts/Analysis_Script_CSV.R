@@ -1,8 +1,10 @@
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(readr)
-library(scales)
+# library(dplyr)
+# library(tidyr)
+# library(ggplot2)
+# library(readr)
+# library(scales)
+
+library(tidyverse)
 
 # ============================================
 # 1. LOAD CSV DATA
@@ -344,3 +346,4 @@ cat(
 )
 
 cat("\n======================================================================\n")
+
