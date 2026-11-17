@@ -1,0 +1,16 @@
+Package: ncrbVictimsAnalysis
+Title: Descriptive Analysis of NCRB Rape Victims Data for 2022
+Version: 1.0.0
+Description: Validates state and union territory records and generates descriptive reports.
+License: MIT
+Encoding: UTF-8
+Depends: R (>= 4.1.0)
+Imports:
+    dplyr (>= 1.1.1),
+    tidyr (>= 1.3.0),
+    readr (>= 2.0.0),
+    purrr (>= 1.0.0),
+    ggplot2 (>= 3.4.0),
+    scales,
+    httr2,
+    xml2

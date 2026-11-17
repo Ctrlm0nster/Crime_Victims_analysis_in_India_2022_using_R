@@ -1,0 +1,64 @@
+NCRB rape victims analysis - 2022
+36 states/UTs; aggregate rows excluded
+
+ total_cases total_child_victims total_women_victims total_all_victims
+       31516                1017               30965             31982
+ avg_cases_per_state child_victim_percentage women_victim_percentage
+            875.4444                3.179914                96.82009
+
+Top 10 states/UTs by reported cases
+       state_ut cases_reported
+      Rajasthan           5399
+  Uttar Pradesh           3690
+ Madhya Pradesh           3029
+    Maharashtra           2904
+        Haryana           1787
+         Odisha           1464
+      Jharkhand           1298
+   Chhattisgarh           1246
+          Delhi           1212
+          Assam           1113
+
+Bottom 10 states/UTs by reported cases
+                                 state_ut cases_reported
+                              Lakshadweep              4
+                                   Ladakh              5
+                                 Nagaland              7
+ Dadra and Nagar Haveli and Daman and Diu              9
+                               Puducherry              9
+              Andaman and Nicobar Islands             12
+                                   Sikkim             13
+                                  Mizoram             14
+                                  Manipur             42
+                                  Tripura             62
+
+Top 10 child victim percentages
+          state_ut child_percentage
+               Goa        76.000000
+        Chandigarh        61.538462
+  Himachal Pradesh        60.433604
+ Arunachal Pradesh        40.540541
+            Ladakh        20.000000
+          Nagaland        14.285714
+         Jharkhand        14.175655
+     Uttar Pradesh        12.432286
+           Mizoram         7.142857
+         Meghalaya         4.000000
+
+Age distribution
+ age_group count percentage
+        <6    32  0.1000563
+     6-<12    88  0.2751548
+    12-<16   370  1.1569008
+    16-<18   527  1.6478019
+    18-<30 21063 65.8589206
+    30-<45  8644 27.0277031
+    45-<60  1171  3.6614346
+       60+    87  0.2720280
+
+Case volume categories
+     case_category  n percentage
+        Low (<100) 14  38.888889
+ Medium (100-<500)  3   8.333333
+  High (500-<1000)  8  22.222222
+ Very high (1000+) 11  30.555556

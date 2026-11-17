@@ -1,0 +1,50 @@
+name: R analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: r-analysis-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-plot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      RENV_CONFIG_AUTOLOADER_ENABLED: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libicu-dev libcairo2-dev libpng-dev fonts-dejavu-core
+      - uses: r-lib/actions/setup-r@v2
+        id: setup-r
+        with:
+          r-version: renv
+          use-public-rspm: true
+      - name: Cache pinned R packages
+        uses: actions/cache@v4
+        with:
+          path: renv/library
+          key: r-analysis-${{ runner.os }}-${{ steps.setup-r.outputs.installed-r-version }}-${{ hashFiles('renv.lock') }}
+      - name: Install renv
+        run: Rscript -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
+      - name: Generate results and run every offline check
+        run: |
+          rm -rf Result/CSV
+          Rscript run.R --restore
+      - name: Upload generated charts, reports, and data
+        uses: actions/upload-artifact@v4
+        with:
+          name: ncrb-analysis-results
+          path: Result/CSV/
+          if-no-files-found: error
+          retention-days: 14
