@@ -187,7 +187,7 @@ Rscript Tests/runner.R
 
 ## GitHub Actions
 
-The [R analysis workflow](.github/workflows/r-analysis.yml) runs on pushes to `main`, pull requests, and manual dispatches. It uses the R version in `renv.lock`, restores pinned packages, removes the saved CSV results, and runs `Rscript run.R --restore` to rebuild and test them from scratch.
+The [R analysis workflow](.github/workflows/r-analysis.yml) runs on pushes to `main`, pull requests, and manual dispatches. It uses a prebuilt R 4.6.2 container matching `renv.lock`, restores pinned packages from CRAN sources, removes the saved CSV results, and runs `Rscript run.R --restore` to rebuild and test them from scratch.
 
 A successful run publishes the generated charts, PDF, report, and data as the `ncrb-analysis-results` artifact, retained for 14 days. Find it under the workflow run on GitHub's Actions tab. The CI checks use local data and XML fixtures, so they require no API secret and remain independent of API availability.
 

@@ -16,6 +16,10 @@ concurrency:
 jobs:
   validate-and-plot:
     runs-on: ubuntu-24.04
+    container: rocker/r-ver:4.6.2
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 30
     env:
       RENV_CONFIG_AUTOLOADER_ENABLED: 'false'
@@ -23,18 +27,13 @@ jobs:
       - uses: actions/checkout@v5
       - name: Install system dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libicu-dev libcairo2-dev libpng-dev fonts-dejavu-core
-      - uses: r-lib/actions/setup-r@v2
-        id: setup-r
-        with:
-          r-version: renv
-          use-public-rspm: true
+          apt-get update
+          apt-get install -y build-essential pkg-config git libcurl4-openssl-dev libssl-dev libxml2-dev libicu-dev libcairo2-dev libpng-dev fonts-dejavu-core
       - name: Cache pinned R packages
         uses: actions/cache@v5
         with:
           path: renv/library
-          key: r-analysis-${{ runner.os }}-${{ steps.setup-r.outputs.installed-r-version }}-${{ hashFiles('renv.lock') }}
+          key: r-analysis-${{ runner.os }}-4.6.2-source-${{ hashFiles('renv.lock') }}
       - name: Install renv
         run: Rscript -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
       - name: Generate results and run every offline check
