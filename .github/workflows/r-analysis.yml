@@ -20,7 +20,7 @@ jobs:
     env:
       RENV_CONFIG_AUTOLOADER_ENABLED: 'false'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -31,7 +31,7 @@ jobs:
           r-version: renv
           use-public-rspm: true
       - name: Cache pinned R packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: renv/library
           key: r-analysis-${{ runner.os }}-${{ steps.setup-r.outputs.installed-r-version }}-${{ hashFiles('renv.lock') }}
@@ -40,7 +40,20 @@ jobs:
       - name: Generate results and run every offline check
         run: |
           rm -rf Result/CSV
-          Rscript run.R --restore
+          set +e
+          Rscript run.R --restore > /tmp/ncrb-analysis.log 2>&1
+          result=$?
+          cat /tmp/ncrb-analysis.log
+          if [ "$result" -ne 0 ]; then
+            python3 - <<'PYTHON'
+          from pathlib import Path
+          lines = Path('/tmp/ncrb-analysis.log').read_text().splitlines()
+          details = '\n'.join(lines[-120:])[-12000:]
+          details = details.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+          print('::error title=R workflow diagnostics::' + details)
+          PYTHON
+          fi
+          exit "$result"
       - name: Upload generated charts, reports, and data
         uses: actions/upload-artifact@v4
         with:
