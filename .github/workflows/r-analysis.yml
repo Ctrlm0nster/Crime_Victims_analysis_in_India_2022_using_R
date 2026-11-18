@@ -38,6 +38,7 @@ jobs:
         run: Rscript -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
       - name: Generate results and run every offline check
         run: |
+          cp README.md /tmp/ncrb-committed-readme.md
           rm -rf Result/CSV
           set +e
           Rscript run.R --restore > /tmp/ncrb-analysis.log 2>&1
@@ -56,7 +57,7 @@ jobs:
       - name: Check rendered README
         run: |
           Rscript Scripts/Render_README.R --check
-          git diff --exit-code -- README.md
+          cmp /tmp/ncrb-committed-readme.md README.md
       - name: Upload generated charts, reports, and data
         uses: actions/upload-artifact@v4
         with:
