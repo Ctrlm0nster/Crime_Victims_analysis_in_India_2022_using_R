@@ -1,0 +1,22 @@
+:root { --ink: #172b3a; --muted: #536574; --blue: #0072b2; }
+body { color: var(--ink); background: #f3f6f9; }
+.app-brand { padding: 0.25rem 0; }
+.brand-kicker { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.18em; color: var(--blue); }
+.app-brand h1 { font-size: clamp(1.25rem, 2.5vw, 1.9rem); font-weight: 750; margin: 0.25rem 0; }
+.intro-strip { border-left: 4px solid var(--blue); padding: 1rem 1.25rem; background: #fff; border-radius: 0.65rem; margin-bottom: 0.8rem; }
+.intro-strip > p:first-child { font-weight: 650; margin-bottom: 0.3rem; }
+.selection-note { font-size: 0.9rem; color: var(--muted); padding: 0.2rem 0 1rem; }
+.bslib-value-box { min-height: 125px; box-shadow: 0 3px 14px #172b3a08; }
+.bslib-value-box .value-box-value { font-variant-numeric: tabular-nums; }
+.card { border: 1px solid #dce5ec; box-shadow: 0 5px 20px #172b3a08; }
+.chart-note, .app-footer { font-size: 0.85rem; color: var(--muted); }
+.app-footer { padding: 1.25rem 0 0.5rem; }
+.selectize-control.multi .selectize-input { max-height: 180px; overflow-y: auto; }
+.table { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 3px solid #b34f00 !important; outline-offset: 3px; }
+@media (max-width: 650px) { .intro-strip { padding: 0.8rem; } .app-brand h1 { font-size: 1.25rem; } }
+
+.navbar.navbar-static-top { background: #fff; color: var(--ink); border-bottom: 1px solid #dce5ec; }
+.navbar h1 { color: var(--ink); }
+.nav-link { color: #00649b; }
+.nav-link:hover, .nav-link:focus { color: #004b75; }

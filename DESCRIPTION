@@ -14,4 +14,7 @@ Imports:
     scales,
     httr2,
     xml2,
-    knitr
+    knitr,
+    shiny,
+    bslib,
+    rmarkdown

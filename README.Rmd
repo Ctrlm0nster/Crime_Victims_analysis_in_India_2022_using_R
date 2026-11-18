@@ -78,7 +78,7 @@ The individual scripts below remain available when you want to run one step.
 Install the plotting dependencies once in R:
 
 ```r
-install.packages(c("dplyr", "tidyr", "readr", "purrr", "ggplot2", "scales", "knitr"))
+install.packages(c("dplyr", "tidyr", "readr", "purrr", "ggplot2", "scales", "knitr", "shiny", "bslib", "rmarkdown"))
 ```
 
 Then run:
@@ -199,6 +199,28 @@ Rscript Tests/runner.R
 
 `runner.R` checks help and invalid arguments from another working directory. When credentials are absent, it also checks that `--live` fails without changing result files.
 
+## Quarto report and Shiny application
+
+The [Quarto document](report.qmd) combines the findings, all six charts, a jurisdiction table, and the methods in a self-contained HTML report. The [Shiny app](App/app.R) provides jurisdiction filters, metric rankings, age profiles, table search, and a CSV download for the current selection. Both read the validated local data and require no API key.
+
+Render the report with [Quarto CLI](https://quarto.org/docs/get-started/) installed:
+
+```sh
+Rscript run.R --restore --report
+```
+
+The renderer also recognizes a project-local CLI at `.tools/quarto/bin/quarto`, or an executable set with `QUARTO_BIN`. The tested CLI version is 1.11.9. Open `Result/report/report.html` in a browser; its images and styling are embedded for sharing as a single file. Rendering can also be run separately with `Rscript Scripts/Render_Report.R` or `quarto render report.qmd`.
+
+Start the Shiny app locally:
+
+```sh
+Rscript Scripts/Run_App.R
+```
+
+Open `http://127.0.0.1:3838`. Set the `PORT` environment variable to use another port. In RStudio, `shiny::runApp("App")` also works. The app runs in an R process; the repository contains its source and a [preview](Result/previews/shiny-desktop.png).
+
+Sidebar filters update every tab, total, and download. The ranking limit affects only the ranking chart. Table search affects only the table. Empty selections show a clear message instead of a misleading national total. The app's reactive behavior is tested with `Rscript Tests/shiny.R`, which is also part of `run.R`.
+
 ## Editing this README
 
 [README.Rmd](README.Rmd) is the editable source for this page. Its R chunks read the generated dashboard summary to build the findings table. GitHub displays the rendered `README.md`; it does not execute R chunks itself.
@@ -219,9 +241,9 @@ The renderer uses `knitr` directly to produce GitHub Markdown, so Pandoc is not 
 
 ## GitHub Actions
 
-The [R analysis workflow](.github/workflows/r-analysis.yml) runs on pushes to `main`, pull requests, and manual dispatches. It uses a prebuilt R 4.6.2 container matching `renv.lock`, restores pinned packages from CRAN sources, removes the saved CSV results, and runs `Rscript run.R --restore` to rebuild and test them from scratch. It then compares the freshly rendered README with the committed version.
+The [R analysis workflow](.github/workflows/r-analysis.yml) runs on pushes to `main`, pull requests, and manual dispatches. It uses a prebuilt R 4.6.2 container matching `renv.lock`, restores pinned packages from CRAN sources, removes the saved CSV results, and runs `Rscript run.R --restore --report` to rebuild and test them from scratch. It then compares the freshly rendered README with the committed version.
 
-A successful run publishes the generated charts, PDF, report, and data as the `ncrb-analysis-results` artifact, retained for 14 days. Find it under the workflow run on GitHub's Actions tab. The CI checks use local data and XML fixtures, so they require no API secret and remain independent of API availability.
+It also renders the Quarto report and tests the Shiny server with local fixtures. A successful run publishes the generated charts, PDF, HTML report, and data as the `ncrb-analysis-results` artifact, retained for 14 days. Find it under the workflow run on GitHub's Actions tab. The CI checks use local data and XML fixtures, so they require no API secret and remain independent of API availability.
 
 ## Folder layout
 
@@ -239,17 +261,26 @@ Scripts/
 ├── Data.R                Validation, CSV input, and XML/API access
 ├── Analysis.R            Summaries, reports, and data exports
 ├── Plots.R               Chart construction, theme, and exports
-└── Render_README.R       Render or check README.Rmd
+├── Render_README.R       Render or check README.Rmd
+├── Render_Report.R       Render the Quarto HTML document
+└── Run_App.R             Start the Shiny app on localhost
 Tests/
 ├── validation.R          Data and contrast checks
 ├── outputs.R             Generated artifact checks
 ├── api.R                 Offline XML and pagination checks
-└── runner.R              Command-line preflight checks
+├── runner.R              Command-line preflight checks
+├── shiny.R               Shiny reactive behavior checks
+└── report.R              Rendered HTML report checks
 README.Rmd                Editable README with executable R chunks
 README.md                 Rendered README displayed by GitHub
 renv.lock                 Pinned package versions
 run.R                     Generate results and run checks
+App/                      Shiny UI, server, data helpers, and styles
+report.qmd                Quarto report source
+_quarto.yml               Report rendering configuration
 Result/
+├── report/               Self-contained Quarto HTML report
+├── previews/             Report and app screenshots
 ├── CSV/
 │   ├── data/             Cleaned CSV, population context, dashboard RDS
 │   ├── plots/            Six PNGs and the combined PDF

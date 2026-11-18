@@ -1,0 +1,137 @@
+---
+title: "Reported cases & victim profiles"
+subtitle: "Rape victims in India, 2022 · NCRB descriptive analysis"
+author: "Crime Victims Analysis Project"
+---
+
+```{r}
+#| label: setup
+source("Scripts/Common.R")
+data <- read_source_csv()
+summary <- summarise_records(data)
+metrics <- summary$total_stats
+plots <- build_plots(data, summary)
+format_count <- function(x) scales::comma(x, accuracy = 1)
+```
+
+::: {.report-intro}
+A view of reported rape cases and victim ages across India's **28 states and 8 union territories**. All figures below are recalculated from the validated source data when this report is rendered.
+:::
+
+```{r}
+#| label: headline-metrics
+#| results: asis
+labels <- c("Reported cases", "Victims", "Child victims", "Child victim share")
+values <- c(format_count(metrics$total_cases), format_count(metrics$total_all_victims),
+            format_count(metrics$total_child_victims), sprintf("%.2f%%", metrics$child_victim_percentage))
+cat('<div class="metric-grid">')
+for (i in seq_along(labels))
+    cat(sprintf('<div class="metric-card"><span>%s</span><strong>%s</strong></div>', labels[i], values[i]))
+cat('</div>')
+```
+
+::: {.callout-note title="Read the measures separately"}
+A reported case can involve more than one victim. These data describe recorded cases and victims. Population size, reporting practices, and administrative differences affect comparisons between jurisdictions.
+:::
+
+## Findings at a glance
+
+- **`r summary$top_10_states$state_ut[1]`** recorded the highest case count: **`r format_count(summary$top_10_states$cases_reported[1])`**.
+- People aged **18 to under 30** accounted for **`r sprintf("%.2f%%", 100 * summary$age_distribution[["women_18_to_30"]] / metrics$total_all_victims)`** of victims.
+- Adults made up **`r sprintf("%.2f%%", metrics$women_victim_percentage)`** of recorded victims.
+- The 36 individual jurisdictions are included once. The four source summary rows are excluded from all totals and rankings.
+
+## Cases and victims by jurisdiction
+
+::: {.panel-tabset}
+
+### Reported cases
+
+```{r}
+#| label: fig-reported-cases
+#| fig-cap: "The 15 jurisdictions with the most reported cases. Counts are shown directly on the bars."
+#| fig-alt: "A horizontal bar chart led by Rajasthan with 5399 reported cases, followed by Uttar Pradesh and Madhya Pradesh."
+plots[[1]]
+```
+
+### Adult and child victims
+
+```{r}
+#| label: fig-demographics
+#| fig-cap: "The 15 jurisdictions with the most victims. Each panel has its own count scale, so bar lengths should be compared within a panel."
+#| fig-alt: "Separate labeled adult and child victim panels for the 15 jurisdictions with the most total victims."
+plots[[2]]
+```
+
+### Case volume groups
+
+```{r}
+#| label: fig-case-groups
+#| fig-cap: "Every state or union territory belongs to exactly one case volume group."
+#| fig-alt: "Four labeled case volume groups with 14 jurisdictions under 100 cases, 3 with 100 to 499, 8 with 500 to 999, and 11 with at least 1000."
+plots[[5]]
+```
+
+:::
+
+## Victim ages
+
+The age intervals include their lower boundary and exclude their upper boundary. For example, **18–<30** includes ages 18 through 29. **60+** includes ages 60 and older.
+
+```{r}
+#| label: fig-age-distribution
+#| fig-cap: "Victim counts and shares across all 36 jurisdictions. Blue represents adults; dark orange represents children. Direct labels carry the same information without relying on color."
+#| fig-alt: "Eight age groups with counts and percentages. The largest is 18 to under 30, with 21063 victims."
+plots[[3]]
+```
+
+```{r}
+#| label: fig-age-profiles
+#| fig-cap: "Age shares in the ten jurisdictions with the most reported cases. Every row totals 100% before rounding; darker cells indicate larger shares."
+#| fig-alt: "A labeled blue heatmap of eight age groups for ten jurisdictions. Each cell prints its percentage."
+plots[[6]]
+```
+
+## Child victim shares
+
+The share is **child victims divided by all victims**, using the same jurisdiction or selection in both parts of the calculation. A high share can occur when there are very few victims overall.
+
+```{r}
+#| label: fig-child-shares
+#| fig-cap: "Jurisdictions with reported child victims. The labels include the underlying child and total victim counts to make small denominators visible."
+#| fig-alt: "Child victim percentages with numerator and denominator labels. Goa has 57 child victims out of 75 total victims, or 76 percent."
+plots[[4]]
+```
+
+## The jurisdiction records
+
+The table below includes all 36 jurisdictions. For filtering and downloads, use the companion Shiny application by running `Rscript Scripts/Run_App.R` from the project root.
+
+```{r}
+#| label: tbl-jurisdictions
+#| tbl-cap: "Validated jurisdiction totals, ordered by reported cases."
+data |>
+    dplyr::transmute(`State / UT` = state_ut, Cases = cases_reported, Victims = total_victims,
+                     Children = total_child_victims, Adults = total_women_victims,
+                     `Child share (%)` = round(child_percentage, 2)) |>
+    knitr::kable(format = "html", digits = 2, align = c("l", rep("r", 5)),
+                  table.attr = 'class="table table-striped table-hover"')
+```
+
+## Source, validation, and limitations
+
+**Source:** NCRB, *State/UT-wise Number of Women and Girls Victims of Rape during 2022*, distributed through data.gov.in resource `0a096e81-5a1b-4e23-9f28-1abd1db76d16`. Clarifications from Nagaland were pending in the source notes.
+
+The report reads `Data/raw/NCRB_DATA.3.csv` and uses the same validation and summary functions as the CSV workflow and Shiny application. Validation checks the source schema, complete coverage of 36 unique jurisdictions, nonnegative integer counts, and reconciliation of age groups with victim subtotals.
+
+These are descriptive results. Reporting practices and population sizes differ across jurisdictions, and recorded cases do not measure the full incidence of sexual violence. This report makes no causal claims and does not present raw-count rankings as comparative safety rankings.
+
+The supplied population table uses **2011 census** figures. It cannot resolve the 2022 boundaries of Andhra Pradesh, Telangana, Jammu and Kashmir, and Ladakh. Population-based rates are therefore omitted from this report and the app. A separately labeled population-context CSV remains available in the project results.
+
+### Reproduce this report
+
+```{.bash}
+Rscript run.R --restore --report
+```
+
+The report uses local data and needs no API key. Its HTML output embeds chart images and styling, so the resulting `Result/report/report.html` can be shared as a single file.

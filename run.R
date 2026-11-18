@@ -1,12 +1,12 @@
 #!/usr/bin/env Rscript
-# Run from any directory: Rscript /path/to/project/run.R [--restore] [--live]
+# Run from any directory: Rscript /path/to/project/run.R [--restore] [--live] [--report]
 args <- commandArgs(trailingOnly = TRUE)
-usage <- "Usage: Rscript run.R [--restore] [--live]\n  --restore  Restore package versions from renv.lock before running\n  --live     Fetch XML data and compare it with the local CSV\n"
+usage <- "Usage: Rscript run.R [--restore] [--live] [--report]\n  --restore  Restore package versions from renv.lock before running\n  --live     Fetch XML data and compare it with the local CSV\n  --report   Also render the Quarto HTML report (requires Quarto CLI)\n"
 if ("--help" %in% args) {
     cat(usage)
     quit(status = 0)
 }
-if (any(!args %in% c("--restore", "--live"))) stop(usage, call. = FALSE)
+if (any(!args %in% c("--restore", "--live", "--report"))) stop(usage, call. = FALSE)
 script <- grep("^--file=", commandArgs(), value = TRUE)
 if (length(script)) setwd(dirname(normalizePath(sub("^--file=", "", script[[1]]))))
 if (file.exists(".Renviron")) readRenviron(".Renviron")
@@ -38,6 +38,7 @@ check <- \(path) sys.source(path, envir = new.env(parent = globalenv()))
 check("Tests/validation.R")
 check("Tests/api.R")
 check("Tests/runner.R")
+check("Tests/shiny.R")
 csv <- read_source_csv()
 xml <- NULL
 if (live) {
@@ -57,5 +58,10 @@ source("Tests/outputs.R")
 verify_outputs(directories)
 source("Scripts/Render_README.R")
 render_readme()
+if ("--report" %in% args) {
+    source("Scripts/Render_Report.R")
+    render_report()
+    check("Tests/report.R")
+}
 cat(if (live) "Complete: CSV and live XML results generated; all checks passed.\n"
     else "Complete: CSV results generated; all offline checks passed. Live API check not requested.\n")

@@ -54,3 +54,11 @@ rsconnect/
 # Local dependency library restored from renv.lock
 /renv/library/
 /renv/staging/
+
+# Local tools and Quarto intermediates
+/.tools/
+/.quarto/
+/report_files/
+/report.knit.md
+
+**/*.quarto_ipynb

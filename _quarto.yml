@@ -1,0 +1,28 @@
+project:
+  type: default
+  render:
+    - report.qmd
+  output-dir: Result/report
+  execute-dir: project
+
+execute:
+  echo: false
+  warning: false
+  message: false
+
+format:
+  html:
+    theme:
+      - cosmo
+      - report.scss
+    css: report.css
+    toc: true
+    toc-depth: 2
+    number-sections: false
+    embed-resources: true
+    code-fold: true
+    fig-width: 11
+    fig-height: 7
+    fig-dpi: 150
+    link-external-newwindow: true
+    lang: en
