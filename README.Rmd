@@ -10,6 +10,8 @@ metrics <- dashboard$key_metrics
 
 [![R analysis](https://github.com/Ctrlm0nster/Crime_Victims_analysis_in_India_2022_using_R/actions/workflows/r-analysis.yml/badge.svg)](https://github.com/Ctrlm0nster/Crime_Victims_analysis_in_India_2022_using_R/actions/workflows/r-analysis.yml)
 
+[Read the published report](https://ctrlm0nster.github.io/Crime_Victims_analysis_in_India_2022_using_R/) · [Open the interactive app](https://ctrlm0nster.github.io/Crime_Victims_analysis_in_India_2022_using_R/app/)
+
 An analysis of NCRB data on reported rape cases and victims across India's **28 states and 8 union territories**. The project validates the source records, calculates descriptive statistics, and produces charts showing case counts, victim ages, and the share of child victims.
 
 [View the six-chart PDF](Result/CSV/plots/CSV_Generated_Plots.pdf) · [Read the analysis report](Result/CSV/reports/ncrb_analysis_report_2022.txt) · [Download the cleaned CSV](Result/CSV/data/ncrb_rape_data_2022_cleaned.csv)
@@ -211,7 +213,21 @@ Rscript run.R --restore --report
 
 The renderer also recognizes a project-local CLI at `.tools/quarto/bin/quarto`, or an executable set with `QUARTO_BIN`. The tested CLI version is 1.11.9. Open `Result/report/report.html` in a browser; its images and styling are embedded for sharing as a single file. Rendering can also be run separately with `Rscript Scripts/Render_Report.R` or `quarto render report.qmd`.
 
-Start the Shiny app locally:
+### Published website
+
+The report and interactive app are hosted on **GitHub Pages**. The app uses **ShinyLive** to run R in the visitor's browser, so no shinyapps.io account or hosted R server is required. The first visit downloads the R runtime and packages and may take a little longer to load. The browser version uses WebR-compatible packages; `renv.lock` pins the native R build environment.
+
+Build the same static site locally:
+
+```sh
+Rscript run.R --restore --site
+```
+
+This renders the report, prepares an allowlisted app bundle containing public data and app files, exports the browser app, and checks the site structure. The generated `Result/site/` directory is ready for static hosting. On successful builds of `main`, GitHub Actions uploads this directory and deploys it through the `github-pages` environment. Pull requests run the build without publishing.
+
+### Local Shiny app
+
+Start the native Shiny app locally:
 
 ```sh
 Rscript Scripts/Run_App.R
@@ -241,9 +257,9 @@ The renderer uses `knitr` directly to produce GitHub Markdown, so Pandoc is not 
 
 ## GitHub Actions
 
-The [R analysis workflow](.github/workflows/r-analysis.yml) runs on pushes to `main`, pull requests, and manual dispatches. It uses a prebuilt R 4.6.2 container matching `renv.lock`, restores pinned packages from CRAN sources, removes the saved CSV results, and runs `Rscript run.R --restore --report` to rebuild and test them from scratch. It then compares the freshly rendered README with the committed version.
+The [R analysis workflow](.github/workflows/r-analysis.yml) runs on pushes to `main`, pull requests, and manual dispatches. It uses a prebuilt R 4.6.2 container matching `renv.lock`, restores pinned packages from CRAN sources, removes the saved CSV results, and runs `Rscript run.R --restore --site` to rebuild and test them from scratch. It then compares the freshly rendered README with the committed version.
 
-It also renders the Quarto report and tests the Shiny server with local fixtures. A successful run publishes the generated charts, PDF, HTML report, and data as the `ncrb-analysis-results` artifact, retained for 14 days. Find it under the workflow run on GitHub's Actions tab. The CI checks use local data and XML fixtures, so they require no API secret and remain independent of API availability.
+It also renders the Quarto report, tests the Shiny server with local fixtures, and builds the browser-based application. Successful main-branch builds publish both to GitHub Pages. A successful run publishes the generated charts, PDF, HTML report, and data as the `ncrb-analysis-results` artifact, retained for 14 days. Find it under the workflow run on GitHub's Actions tab. The CI checks use local data and XML fixtures, so they require no API secret and remain independent of API availability.
 
 ## Folder layout
 
@@ -263,14 +279,16 @@ Scripts/
 ├── Plots.R               Chart construction, theme, and exports
 ├── Render_README.R       Render or check README.Rmd
 ├── Render_Report.R       Render the Quarto HTML document
-└── Run_App.R             Start the Shiny app on localhost
+├── Run_App.R             Start the Shiny app on localhost
+└── Build_Site.R           Bundle public app files and export the static site
 Tests/
 ├── validation.R          Data and contrast checks
 ├── outputs.R             Generated artifact checks
 ├── api.R                 Offline XML and pagination checks
 ├── runner.R              Command-line preflight checks
 ├── shiny.R               Shiny reactive behavior checks
-└── report.R              Rendered HTML report checks
+├── report.R              Rendered HTML report checks
+└── site.R                Portable bundle and static website checks
 README.Rmd                Editable README with executable R chunks
 README.md                 Rendered README displayed by GitHub
 renv.lock                 Pinned package versions

@@ -28,7 +28,7 @@ jobs:
       - name: Install system dependencies
         run: |
           apt-get update
-          apt-get install -y build-essential pkg-config git curl libuv1-dev libcurl4-openssl-dev libssl-dev libxml2-dev libicu-dev libcairo2-dev libpng-dev fonts-dejavu-core
+          apt-get install -y build-essential pkg-config git curl libuv1-dev libarchive-dev libcurl4-openssl-dev libssl-dev libxml2-dev libicu-dev libcairo2-dev libpng-dev fonts-dejavu-core
       - name: Cache pinned R packages
         uses: actions/cache@v5
         with:
@@ -46,14 +46,21 @@ jobs:
         run: |
           mkdir -p .tools/quarto
           curl -fsSL https://github.com/quarto-dev/quarto-cli/releases/download/v1.11.9/quarto-1.11.9-linux-amd64.tar.gz | tar -xz -C .tools/quarto --strip-components=1
+      - name: Cache browser runtime assets
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/shinylive
+          key: shinylive-${{ runner.os }}-0.10.12
       - name: Install renv
         run: Rscript -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
-      - name: Generate results and run every offline check
+      - name: Generate, test, and build the public site
+        env:
+          GITHUB_PAT: ${{ github.token }}
         run: |
           cp README.md /tmp/ncrb-committed-readme.md
           rm -rf Result/CSV
           set +e
-          Rscript run.R --restore --report > /tmp/ncrb-analysis.log 2>&1
+          Rscript run.R --restore --site > /tmp/ncrb-analysis.log 2>&1
           result=$?
           cat /tmp/ncrb-analysis.log
           if [ "$result" -ne 0 ]; then
@@ -79,3 +86,23 @@ jobs:
             Result/report/
           if-no-files-found: error
           retention-days: 14
+      - name: Upload website for GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: Result/site
+
+  deploy-pages:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: validate-and-plot
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish report and interactive app
+        id: deployment
+        uses: actions/deploy-pages@v4

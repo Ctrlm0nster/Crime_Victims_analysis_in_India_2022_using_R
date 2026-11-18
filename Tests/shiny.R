@@ -14,6 +14,12 @@ local({
         session$setInputs(region = "All jurisdictions", states = "Goa", proportions = TRUE)
         stopifnot(metrics()$victims == 75, metrics()$child_share == 76,
                   abs(sum(ages()$value) - 100) < 1e-8, nrow(table_data()) == 1)
+        captured <- NULL
+        session$sendCustomMessage <- function(type, message) captured <<- list(type = type, message = message)
+        session$setInputs(download = 1)
+        downloaded <- readr::read_csv(I(captured$message$csv), show_col_types = FALSE)
+        stopifnot(captured$type == "download-csv", nrow(downloaded) == 1,
+                  downloaded$state_ut == "Goa", downloaded$total_child_victims == 57)
         session$setInputs(search = "[")
         stopifnot(nrow(table_data()) == 0)
         session$setInputs(search = "gOa")

@@ -34,6 +34,8 @@ cat('</div>')
 A reported case can involve more than one victim. These data describe recorded cases and victims. Population size, reporting practices, and administrative differences affect comparisons between jurisdictions.
 :::
 
+[Open the interactive app](https://ctrlm0nster.github.io/Crime_Victims_analysis_in_India_2022_using_R/app/){.btn .btn-primary}
+
 ## Findings at a glance
 
 - **`r summary$top_10_states$state_ut[1]`** recorded the highest case count: **`r format_count(summary$top_10_states$cases_reported[1])`**.

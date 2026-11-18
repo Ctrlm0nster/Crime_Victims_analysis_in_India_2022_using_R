@@ -1,12 +1,12 @@
 #!/usr/bin/env Rscript
-# Run from any directory: Rscript /path/to/project/run.R [--restore] [--live] [--report]
+# Run from any directory: Rscript /path/to/project/run.R [--restore] [--live] [--report] [--site]
 args <- commandArgs(trailingOnly = TRUE)
-usage <- "Usage: Rscript run.R [--restore] [--live] [--report]\n  --restore  Restore package versions from renv.lock before running\n  --live     Fetch XML data and compare it with the local CSV\n  --report   Also render the Quarto HTML report (requires Quarto CLI)\n"
+usage <- "Usage: Rscript run.R [--restore] [--live] [--report] [--site]\n  --restore  Restore package versions from renv.lock before running\n  --live     Fetch XML data and compare it with the local CSV\n  --report   Also render the Quarto HTML report (requires Quarto CLI)\n  --site     Build the report and browser-based Shiny site for hosting\n"
 if ("--help" %in% args) {
     cat(usage)
     quit(status = 0)
 }
-if (any(!args %in% c("--restore", "--live", "--report"))) stop(usage, call. = FALSE)
+if (any(!args %in% c("--restore", "--live", "--report", "--site"))) stop(usage, call. = FALSE)
 script <- grep("^--file=", commandArgs(), value = TRUE)
 if (length(script)) setwd(dirname(normalizePath(sub("^--file=", "", script[[1]]))))
 if (file.exists(".Renviron")) readRenviron(".Renviron")
@@ -58,10 +58,15 @@ source("Tests/outputs.R")
 verify_outputs(directories)
 source("Scripts/Render_README.R")
 render_readme()
-if ("--report" %in% args) {
+if (any(c("--report", "--site") %in% args)) {
     source("Scripts/Render_Report.R")
     render_report()
     check("Tests/report.R")
+}
+if ("--site" %in% args) {
+    source("Scripts/Build_Site.R")
+    build_site()
+    check("Tests/site.R")
 }
 cat(if (live) "Complete: CSV and live XML results generated; all checks passed.\n"
     else "Complete: CSV results generated; all offline checks passed. Live API check not requested.\n")

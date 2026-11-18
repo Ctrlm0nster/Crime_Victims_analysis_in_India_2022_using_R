@@ -17,4 +17,6 @@ Imports:
     knitr,
     shiny,
     bslib,
-    rmarkdown
+    rmarkdown,
+    shinylive,
+    jsonlite

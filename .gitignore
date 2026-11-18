@@ -62,3 +62,7 @@ rsconnect/
 /report.knit.md
 
 **/*.quarto_ipynb
+
+# Generated static hosting files and portable app bundle
+/Result/site/
+/Result/app-bundle/
