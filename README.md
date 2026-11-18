@@ -1,3 +1,7 @@
+<!-- README.md is generated from README.Rmd. Edit README.Rmd, then run Rscript Scripts/Render_README.R. -->
+
+
+
 # Rape victims in India, 2022: analysis in R
 
 [![R analysis](https://github.com/Ctrlm0nster/Crime_Victims_analysis_in_India_2022_using_R/actions/workflows/r-analysis.yml/badge.svg)](https://github.com/Ctrlm0nster/Crime_Victims_analysis_in_India_2022_using_R/actions/workflows/r-analysis.yml)
@@ -10,14 +14,15 @@ An analysis of NCRB data on reported rape cases and victims across India's **28 
 
 ## Findings
 
-| Measure | 2022 total |
-| --- | ---: |
-| Reported cases | 31,516 |
-| Victims | 31,982 |
-| Child victims, under 18 | 1,017 |
-| Adult victims, 18 and older | 30,965 |
-| Children as a share of all victims | 3.18% |
-| Average reported cases per state/UT | 875.44 |
+
+|Measure                             | 2022 total|
+|:-----------------------------------|----------:|
+|Reported cases                      |     31,516|
+|Victims                             |     31,982|
+|Child victims, under 18             |      1,017|
+|Adult victims, 18 and older         |     30,965|
+|Children as a share of all victims  |      3.18%|
+|Average reported cases per state/UT |     875.44|
 
 Rajasthan recorded the highest case count (5,399), followed by Uttar Pradesh (3,690) and Madhya Pradesh (3,029). Victims aged 18 to under 30 accounted for 21,063 victims, or 65.86% of the total.
 
@@ -64,7 +69,7 @@ The individual scripts below remain available when you want to run one step.
 Install the plotting dependencies once in R:
 
 ```r
-install.packages(c("dplyr", "tidyr", "readr", "purrr", "ggplot2", "scales"))
+install.packages(c("dplyr", "tidyr", "readr", "purrr", "ggplot2", "scales", "knitr"))
 ```
 
 Then run:
@@ -185,9 +190,27 @@ Rscript Tests/runner.R
 
 `runner.R` checks help and invalid arguments from another working directory. When credentials are absent, it also checks that `--live` fails without changing result files.
 
+## Editing this README
+
+[README.Rmd](README.Rmd) is the editable source for this page. Its R chunks read the generated dashboard summary to build the findings table. GitHub displays the rendered `README.md`; it does not execute R chunks itself.
+
+After changing the source or analysis results, render the README from the project root:
+
+```sh
+Rscript Scripts/Render_README.R
+```
+
+To check that the committed Markdown matches its source:
+
+```sh
+Rscript Scripts/Render_README.R --check
+```
+
+The renderer uses `knitr` directly to produce GitHub Markdown, so Pandoc is not required. Commit both `README.Rmd` and `README.md`. The one-command workflow renders the README after generating results, and GitHub Actions checks that the committed README matches a fresh render.
+
 ## GitHub Actions
 
-The [R analysis workflow](.github/workflows/r-analysis.yml) runs on pushes to `main`, pull requests, and manual dispatches. It uses a prebuilt R 4.6.2 container matching `renv.lock`, restores pinned packages from CRAN sources, removes the saved CSV results, and runs `Rscript run.R --restore` to rebuild and test them from scratch.
+The [R analysis workflow](.github/workflows/r-analysis.yml) runs on pushes to `main`, pull requests, and manual dispatches. It uses a prebuilt R 4.6.2 container matching `renv.lock`, restores pinned packages from CRAN sources, removes the saved CSV results, and runs `Rscript run.R --restore` to rebuild and test them from scratch. It then compares the freshly rendered README with the committed version.
 
 A successful run publishes the generated charts, PDF, report, and data as the `ncrb-analysis-results` artifact, retained for 14 days. Find it under the workflow run on GitHub's Actions tab. The CI checks use local data and XML fixtures, so they require no API secret and remain independent of API availability.
 
@@ -206,12 +229,15 @@ Scripts/
 ├── Schema.R              Source column mappings and age groups
 ├── Data.R                Validation, CSV input, and XML/API access
 ├── Analysis.R            Summaries, reports, and data exports
-└── Plots.R               Chart construction, theme, and exports
+├── Plots.R               Chart construction, theme, and exports
+└── Render_README.R       Render or check README.Rmd
 Tests/
 ├── validation.R          Data and contrast checks
 ├── outputs.R             Generated artifact checks
 ├── api.R                 Offline XML and pagination checks
 └── runner.R              Command-line preflight checks
+README.Rmd                Editable README with executable R chunks
+README.md                 Rendered README displayed by GitHub
 renv.lock                 Pinned package versions
 run.R                     Generate results and run checks
 Result/

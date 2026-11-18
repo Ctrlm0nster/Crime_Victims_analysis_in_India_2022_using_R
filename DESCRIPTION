@@ -13,4 +13,5 @@ Imports:
     ggplot2 (>= 3.4.0),
     scales,
     httr2,
-    xml2
+    xml2,
+    knitr

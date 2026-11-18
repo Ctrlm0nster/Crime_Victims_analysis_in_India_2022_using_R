@@ -55,5 +55,7 @@ if (live) {
 }
 source("Tests/outputs.R")
 verify_outputs(directories)
+source("Scripts/Render_README.R")
+render_readme()
 cat(if (live) "Complete: CSV and live XML results generated; all checks passed.\n"
     else "Complete: CSV results generated; all offline checks passed. Live API check not requested.\n")

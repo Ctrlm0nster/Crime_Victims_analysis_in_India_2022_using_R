@@ -53,6 +53,10 @@ jobs:
           PYTHON
           fi
           exit "$result"
+      - name: Check rendered README
+        run: |
+          Rscript Scripts/Render_README.R --check
+          git diff --exit-code -- README.md
       - name: Upload generated charts, reports, and data
         uses: actions/upload-artifact@v4
         with:
